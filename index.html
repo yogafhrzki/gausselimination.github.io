@@ -38,21 +38,16 @@
             border-radius: 5px;
             background-color: #fff;
         }
-        #result2, #result3 {
-            display: none;
-        }
-        #calculateButton {
-            display: block;
-            width: 100%;
-            padding: 10px;
+        .result-container {
+            display: flex;
+            flex-direction: column;
             margin-top: 20px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
+            padding: 10px;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            cursor: pointer;
+            background-color: #fff;
         }
-        #showResultButton {
+        #calculateButton, #showResultButton {
             display: block;
             width: 100%;
             padding: 10px;
@@ -69,17 +64,17 @@
     <div class="container">
         <h1>Metode Eliminasi Gauss</h1>
         <div class="alert" role="alert">Input harus berupa matriks dengan format <b>A|b</b> - yang berarti Anda perlu memasukkan matriks berukuran <b>n * n+1</b>. Kolomnya dipisahkan oleh spasi.</div>
-        <textarea id="matrixInput" class="form-control" rows="8">3 6 3
-2 1 3
-3 2 4</textarea>
-        <textarea id="rhsInput" class="form-control" rows="8">24
-13
-19</textarea>
+        <textarea id="matrixInput" class="form-control" rows="8">2 3 -1
+1 2 -4
+1 1 4</textarea>
+        <textarea id="rhsInput" class="form-control" rows="8">6
+8
+4</textarea>
         <button id="calculateButton">Tampilkan Langkah-langkah</button>
         <button id="showResultButton">Tampilkan Hasil</button>
-        <div id="result"></div>
-        <div id="result2"></div>
-        <div id="result3"></div>
+        <div id="result" class="result-container"></div>
+        <div id="result2" class="result-container"></div>
+        <div id="result3" class="result-container"></div>
     </div>
     <script>
         function gaussJordan(x, y, verbose = false) {
@@ -106,41 +101,32 @@
                     const innerLoop = [[i + 1, m, 1], [i - 1, -1, -1]];
                     for (let j = innerLoop[d][0]; j != innerLoop[d][1]; j += innerLoop[d][2]) {
                         const k = (-1) * augmentedMat[j][i] / augmentedMat[i][i];
-                        const tempRow = augmentedMat[i].map(val => val * k);
-                        augmentedMat[j] = augmentedMat[j].map((val, index) => val + tempRow[index]);
-                        steps.push({ i: i + 1, j: j + 1, k: k.toFixed(2), tempRow });
+                        for (let l = 0; l <= n; l++) {
+                            augmentedMat[j][l] = augmentedMat[j][l] + k * augmentedMat[i][l];
+                        }
+                        if (verbose) {
+                            console.log(augmentedMat);
+                        }
+                        steps.push(`Gunakan baris ${i + 1} untuk baris ${j + 1}\n` +
+                                   `k=${k.toFixed(2)} * [${augmentedMat[i].join(' ')}] = [${augmentedMat[j].join(' ')}]\n` +
+                                   `${augmentedMat.map(row => `[${row.join(' ')}]`).join('\n')}`);
                     }
                 }
             }
 
             for (let i = 0; i < m; i++) {
                 const divisor = augmentedMat[i][i];
-                augmentedMat[i] = augmentedMat[i].map(val => val / divisor);
+                for (let j = 0; j <= n; j++){
+                    augmentedMat[i][j] = augmentedMat[i][j] / divisor;
+                }
             }
 
             if (verbose) {
                 console.log(augmentedMat);
             }
 
-            return { result: augmentedMat, steps };
-        }
-
-        function matrixToString(matrix, normalize = false) {
-            let result = "";
-            const m = matrix.length;
-            const n = matrix[0].length;
-
-            for (let i = 0; i < m; i++) {
-                for (let j = 0; j < n; j++) {
-                    if (normalize && j === n - 1) {
-                        result += " = ";
-                    }
-                    result += matrix[i][j] + " ";
-                }
-                result += "\n";
-            }
-
-            return result;
+            steps.push(`Normalisasi baris\n${augmentedMat.map(row => `[${row.join(' ')}]`).join('\n')}`);
+            return steps;
         }
 
         const matrixInput = document.getElementById("matrixInput");
@@ -164,13 +150,10 @@
                 return;
             }
 
-            const matrixRows = matrixString.split("\n");
-            const rhsRows = rhsString.split("\n");
+            const matrixRows = matrixString.split("\n").map(row => row.trim().split(/\s+/).map(Number));
+            const rhsRows = rhsString.split("\n").map(row => row.trim());
 
-            const matrix = matrixRows.map(row => row.split(" ").map(Number));
-            const rhs = rhsRows.map(Number);
-
-            if (matrix.length !== rhs.length || matrix[0].length !== matrix.length + 1) {
+            if (!isValidMatrix(matrixRows) || rhsRows.length !== matrixRows.length) {
                 resultDiv.innerText = "Matriks dan vektor hasil harus memiliki ukuran yang sesuai.";
                 resultDiv2.innerText = "";
                 resultDiv3.innerText = "";
@@ -179,26 +162,21 @@
                 return;
             }
 
-            const { result, steps } = gaussJordan(matrix, rhs, true);
+            const rhs = rhsRows.map(Number);
+            const steps = gaussJordan(matrixRows, rhs, true);
 
-            resultDiv.innerText = "Hasil:";
-            resultDiv2.innerText = "Langkah-langkah penyelesaian:";
+            resultDiv.innerText = "Langkah-langkah Eliminasi Gauss-Jordan:";
+            resultDiv2.innerText = "";
             resultDiv3.innerText = "";
-            resultDiv2.style.display = "block";
+            resultDiv2.style.display = "none";
             resultDiv3.style.display = "none";
-            resultDiv2.style.marginTop = "20px";
-            resultDiv2.style.padding = "10px";
-            resultDiv2.style.border = "1px solid #ccc";
-            resultDiv2.style.borderRadius = "5px";
-            resultDiv2.style.backgroundColor = "#fff";
-            resultDiv2.style.whiteSpace = "pre";
 
-            const stepString = steps.map(step => `# Gunakan baris ${step.i} untuk baris ${step.j}\nk=${step.k} * [${step.tempRow}] = [${result[step.j - 1].join(', ')}]\n${matrixToString(result)}`).join("\n");
-            resultDiv2.innerText = `# Matriks tambahan awal\n${matrixToString([...matrix, rhs])}\n${stepString}`;
-
-            resultDiv3.innerText = matrixToString(result);
-
-            resultDiv2.scrollIntoView({ behavior: "smooth" });
+            let stepNumber = 1;
+            steps.forEach(step => {
+                const stepDiv = document.createElement('div');
+                stepDiv.innerText = `Langkah ${stepNumber++}:\n${step}\n\n`;
+                resultDiv.appendChild(stepDiv);
+            });
         });
 
         showResultButton.addEventListener("click", function() {
@@ -210,22 +188,26 @@
                 return;
             }
 
-            const matrixRows = matrixString.split("\n");
-            const rhsRows = rhsString.split("\n");
+            const matrixRows = matrixString.split("\n").map(row => row.trim().split(/\s+/).map(Number));
+            const rhsRows = rhsString.split("\n").map(row => row.trim());
 
-            const matrix = matrixRows.map(row => row.split(" ").map(Number));
-            const rhs = rhsRows.map(Number);
-
-            if (matrix.length !== rhs.length || matrix[0].length !== matrix.length + 1) {
+            if (!isValidMatrix(matrixRows) || rhsRows.length !== matrixRows.length) {
                 alert("Matriks dan vektor hasil harus memiliki ukuran yang sesuai.");
                 return;
             }
 
-            const { result } = gaussJordan(matrix, rhs);
+            const rhs = rhsRows.map(Number);
+            const result = gaussJordan(matrixRows, rhs);
 
             const resultString = result.map(row => row[row.length - 1]).join(", ");
             alert("Hasil: " + resultString);
         });
+
+        function isValidMatrix(matrix) {
+            const rowLengths = matrix.map(row => row.length);
+            const firstRowLength = rowLengths[0];
+            return rowLengths.every(length => length === firstRowLength);
+        }
     </script>
 </body>
 </html>
