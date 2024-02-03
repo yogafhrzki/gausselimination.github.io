@@ -119,7 +119,7 @@
             }
 
             steps.push(`Normalisasi baris\n${augmentedMat.map(row => `[${row.join(' ')}]`).join('\n')}`);
-            return steps;
+            return { steps, augmentedMat };
         }
 
         const matrixInput = document.getElementById("matrixInput");
@@ -138,8 +138,6 @@
                 resultDiv.innerText = "Masukkan matriks dan vektor hasil yang valid.";
                 resultDiv2.innerText = "";
                 resultDiv3.innerText = "";
-                resultDiv2.style.display = "none";
-                resultDiv3.style.display = "none";
                 return;
             }
 
@@ -150,25 +148,22 @@
                 resultDiv.innerText = "Matriks dan vektor hasil harus memiliki ukuran yang sesuai.";
                 resultDiv2.innerText = "";
                 resultDiv3.innerText = "";
-                resultDiv2.style.display = "none";
-                resultDiv3.style.display = "none";
                 return;
             }
 
             const rhs = rhsRows.map(Number);
-            const steps = gaussJordan(matrixRows, rhs, true);
+            const { steps } = gaussJordan(matrixRows, rhs, true);
 
-            resultDiv.innerText = "Langkah-langkah Eliminasi Gauss-Jordan:";
+            resultDiv.innerText = "Hasil:";
             resultDiv2.innerText = "";
-            resultDiv3.innerText = "";
-            resultDiv2.style.display = "none";
-            resultDiv3.style.display = "none";
+            resultDiv3.innerText = "Langkah-langkah Eliminasi Gauss-Jordan:";
+            resultDiv3.appendChild(document.createElement('br'));
 
             let stepNumber = 1;
             steps.forEach(step => {
                 const stepDiv = document.createElement('div');
                 stepDiv.innerText = `Langkah ${stepNumber++}:\n${step}\n\n`;
-                resultDiv.appendChild(stepDiv);
+                resultDiv3.appendChild(stepDiv);
             });
         });
 
@@ -177,7 +172,9 @@
             const rhsString = rhsInput.value.trim();
 
             if (matrixString === "" || rhsString === "") {
-                alert("Masukkan matriks dan vektor hasil yang valid.");
+                resultDiv.innerText = "Masukkan matriks dan vektor hasil yang valid.";
+                resultDiv2.innerText = "";
+                resultDiv3.innerText = "";
                 return;
             }
 
@@ -185,16 +182,19 @@
             const rhsRows = rhsString.split("\n").map(row => row.trim());
 
             if (!isValidMatrix(matrixRows) || rhsRows.length !== matrixRows.length) {
-                alert("Matriks dan vektor hasil harus memiliki ukuran yang sesuai.");
+                resultDiv.innerText = "Matriks dan vektor hasil harus memiliki ukuran yang sesuai.";
+                resultDiv2.innerText = "";
+                resultDiv3.innerText = "";
                 return;
             }
 
             const rhs = rhsRows.map(Number);
-            const result = gaussJordan(matrixRows, rhs);
+            const { augmentedMat } = gaussJordan(matrixRows, rhs);
 
-            const resultString = result.map(row => row[row.length - 1]);
+            const lastRowValues = augmentedMat.map(row => row[row.length - 1]);
 
-            alert("Hasil: [" + resultString.join(", ") + "]");
+            resultDiv.innerText = "Hasil:";
+            resultDiv2.innerText = "[" + lastRowValues.join(", ") + "]";
         });
 
         function isValidMatrix(matrix) {
