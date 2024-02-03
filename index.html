@@ -57,11 +57,13 @@
 <body>
     <div class="container">
         <h1>Metode Eliminasi Gauss</h1>
-        <div class="alert" role="alert">Cara Penggunaan dan Dokumentasi. Input harus berupa matriks dengan format <b>A|b</b> - yang berarti Anda perlu memasukkan matriks berukuran <b>n * n+1</b>. Kolomnya dipisahkan oleh spasi.</div>
-        <textarea id="matrixInput" class="form-control" rows="8">3 6 3 24
-2 1 3 13
-3 2 4 19</textarea>
-        <input type="text" id="rhsInput" class="form-control" placeholder="Masukkan matriks sisi kanan (pisahkan angka dengan spasi)">
+        <div class="alert" role="alert">Input harus berupa matriks dengan format <b>A|b</b> - yang berarti Anda perlu memasukkan matriks berukuran <b>n * n+1</b>. Kolomnya dipisahkan oleh spasi.</div>
+        <textarea id="matrixInput" class="form-control" rows="8">3 6 3
+2 1 3
+3 2 4</textarea>
+        <textarea id="rhsInput" class="form-control" rows="8">24
+13
+19</textarea>
         <button id="calculateButton">Hitung</button>
         <div id="result"></div>
         <div id="result2"></div>
@@ -70,6 +72,42 @@
     </div>
     <script>
         function gaussJordan(x, y, verbose = 0) {
+            let m = x.length;
+            let n = x[0].length;
+            let augmentedMat = new Array(m).fill(0).map(() => new Array(n + 1).fill(0));
+
+            for (let i = 0; i < m; i++) {
+                for (let j = 0; j < n; j++) {
+                    augmentedMat[i][j] = x[i][j];
+                }
+                augmentedMat[i][n] = y[i];
+            }
+
+            if (verbose > 0) {
+                console.log(augmentedMat);
+            }
+
+            const outerLoop = [[0, m - 1, 1], [m - 1, 0, -1]];
+            for (let d = 0; d < 2; d++) {
+                for (let i = outerLoop[d][0]; i != outerLoop[d][1]; i += outerLoop[d][2]) {
+                    const innerLoop = [[i + 1, m, 1], [i - 1, -1, -1]];
+                    for (let j = innerLoop[d][0]; j != innerLoop[d][1]; j += innerLoop[d][2]) {
+                        const k = (-1) * augmentedMat[j][i] / augmentedMat[i][i];
+                        for (let l = 0; l <= n; l++) {
+                            augmentedMat[j][l] = augmentedMat[j][l] + k * augmentedMat[i][l];
+                        }
+                        if (verbose > 0) {
+                            console.log(augmentedMat);
+                        }
+                    }
+                }
+            }
+
+            for (let i = 0; i < m; i++) {
+                const divisor = augmentedMat[i][Kode JavaScript tersebut terpotong di tengah. Berikut adalah kode JavaScript lengkap untuk metode eliminasi Gauss:
+
+```javascript
+function gaussJordan(x, y, verbose = 0) {
     let m = x.length;
     let n = x[0].length;
     let augmentedMat = new Array(m).fill(0).map(() => new Array(n + 1).fill(0));
@@ -108,61 +146,49 @@
         }
     }
 
-    let solution = new Array(m);
-    for (let i = 0; i < m; i++) {
-        solution[i] = augmentedMat[i][n];
+    if (verbose > 0) {
+        console.log(augmentedMat);
     }
 
-    return solution;
+    return augmentedMat.map(row => row[n]);
 }
 
-document.getElementById("calculateButton").addEventListener("click", function() {
-    const matrixInput = document.getElementById("matrixInput").value;
-    const rhsInput = document.getElementById("rhsInput").value;
-    const verbose = document.getElementById("inputAdvancedOutput").checked ? 1 : 0;
+function parseMatrixInput(input) {
+    return input.trim().split('\n').map(row => row.trim().split(/\s+/).map(Number));
+}
 
-    const matrixRows = matrixInput.trim().split("\n");
-    const matrix = matrixRows.map(row => row.trim().split(" ").map(Number));
+function parseRHSInput(input) {
+    return input.trim().split('\n').map(Number);
+}
 
-    const rhs = rhsInput.trim().split(" ").map(Number);
+function formatOutput(output) {
+    return output.map((value, index) => `x${index + 1} = ${value}`).join('\n');
+}
 
-    const solution = gaussJordan(matrix, rhs, verbose);
+function calculate() {
+    const matrixInput = document.getElementById('matrixInput').value;
+    const rhsInput = document.getElementById('rhsInput').value;
+    const verbose = document.getElementById('inputAdvancedOutput').checked ? 1 : 0;
 
-    document.getElementById("result").textContent = "Solusi: " + solution.join(", ");
-    document.getElementById("result").style.display = "block";
-});
+    const matrix = parseMatrixInput(matrixInput);
+    const rhs = parseRHSInput(rhsInput);
 
-        document.getElementById('calculateButton').addEventListener('click', function() {
-            var matrixInput = document.getElementById('matrixInput').value;
-            var rhsInput = document.getElementById('rhsInput').value;
-            var showSteps = document.getElementById('inputAdvancedOutput').checked;
-            var matrix = formatMatrix(matrixInput);
-            var rhs = formatRHS(rhsInput);
-            if (isValidMatrix(matrix) && isValidRHS(rhs)) {
-                var result = gaussJordan(matrix, rhs, showSteps);
-                displayResult(result);
-            } else {
-                alert('Input tidak valid. Pastikan format matriks benar.');
-            }
-        });
-        function formatMatrix(input) {
-            return input.trim().split('\n').map(row => row.split(' ').map(Number));
-        }
-        function formatRHS(input) {
-            return input.trim().split(' ').map(Number);
-        }
-        function isValidMatrix(matrix) {
-            var n = matrix.length;
-            return matrix.every(row => row.length === n + 1);
-        }
-        function isValidRHS(rhs) {
-            var n = rhs.length;
-            return rhs.length === n;
-        }
-        function displayResult(result) {
-            var resultElem = document.getElementById('result');
-            resultElem.innerHTML = '<h3>Hasil</h3><p>' + result.join(', ') + '</p>';
-        }
-    </script>
-</body>
-</html>
+    const result = gaussJordan(matrix, rhs, verbose);
+    const output = formatOutput(result);
+
+    document.getElementById('result').textContent = output;
+    document.getElementById('result').style.display = 'block';
+
+    if (verbose === 1) {
+        document.getElementById('result2').style.display = 'block';
+        document.getElementById('result2').textContent = JSON.stringify(matrix);
+
+        document.getElementById('result3').style.display = 'block';
+        document.getElementById('result3').textContent = JSON.stringify(rhs);
+    } else {
+        document.getElementById('result2').style.display = 'none';
+        document.getElementById('result3').style.display = 'none';
+    }
+}
+
+document.getElementById('calculateButton').addEventListener('click', calculate);
