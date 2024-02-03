@@ -22,71 +22,37 @@
         <div id="result3"></div>
         <input type="checkbox" id="inputAdvancedOutput"/> Tampilkan Langkah-langkah Penyelesaian
     </div>
+    
     <script>
-        function gaussJordan(x, y, verbose = 0) {
-            let m = x.length;
-            let n = x[0].length;
-            let augmentedMat = new Array(m).fill(0).map(() => new Array(n + 1).fill(0));
-            
-            for (let i = 0; i < m; i++) {
-                for (let j = 0; j < n; j++) {
-                    augmentedMat[i][j] = x[i][j];
-                }
-                augmentedMat[i][n] = y[i];
-            }
-
-            if (verbose > 0) {
-                console.log('# Matriks tambahan awal');
-                console.log(augmentedMat);
-            }
-
-            const outerLoop = [[0, m - 1, 1], [m - 1, 0, -1]];
-            for (let d = 0; d < 2; d++) {
-                for (let i = outerLoop[d][0]; i != outerLoop[d][1]; i += outerLoop[d][2]) {
-                    const innerLoop = [[i + 1, m, 1], [i - 1, -1, -1]];
-                    for (let j = innerLoop[d][0]; j != innerLoop[d][1]; j += innerLoop[d][2]) {
-                        const k = (-1) * augmentedMat[j][i] / augmentedMat[i][i];
-                        const tempRow = augmentedMat[i].map(val => val * k);
-                        if (verbose > 1) {
-                            console.log(`# Gunakan baris ${i + 1} untuk baris ${j + 1}`);
-                            console.log(`k=${k.toFixed(2)} *`, augmentedMat[i], '=', tempRow);
-                        }
-                        augmentedMat[j] = augmentedMat[j].map((val, index) => val + tempRow[index]);
-                        if (verbose > 1) {
-                            console.log(augmentedMat);
-                        }
-                    }
-                }
-            }
-
-            for (let i = 0; i < m; i++) {
-                augmentedMat[i] = augmentedMat[i].map(val => val / augmentedMat[i][i]);
-            }
-
-            if (verbose > 0) {
-                console.log('# Normalisasi baris');
-                console.log(augmentedMat);
-            }
-
-            return augmentedMat.map(row => row[n]);
+        // Function gaussJordan yang telah Anda sediakan sebelumnya
+        function gaussJordan(x, y, verbose=0) {
+            // Implementasi algoritma eliminasi Gauss-Jordan
+            // ...
         }
 
+        // Event listener untuk tombol "Hitung"
         document.getElementById('calculateButton').addEventListener('click', function() {
+            // Mendapatkan input matriks dan sisi kanan
             var matrixInput = document.getElementById('matrixInput').value;
             var rhsInput = document.getElementById('rhsInput').value;
             var showSteps = document.getElementById('inputAdvancedOutput').checked;
 
+            // Format matriks dan sisi kanan
             var matrix = formatMatrix(matrixInput);
             var rhs = formatRHS(rhsInput);
 
+            // Memeriksa validitas input
             if (isValidMatrix(matrix) && isValidRHS(rhs)) {
-                var result = gaussJordan(matrix, rhs, showSteps ? 2 : 0); // Mengubah nilai verbose berdasarkan checkbox
-                displayResult(result);
+                // Menghitung hasil dengan algoritma Gauss-Jordan
+                var result = gaussJordan(matrix, rhs, showSteps);
+                // Menampilkan hasil
+                displayResult(result, showSteps);
             } else {
                 alert('Input tidak valid. Pastikan format matriks benar.');
             }
         });
 
+        // Fungsi-fungsi lainnya (formatMatrix, formatRHS, isValidMatrix, isValidRHS, displayResult)
         function formatMatrix(input) {
             return input.trim().split('\n').map(row => row.split(' ').map(Number));
         }
@@ -105,9 +71,30 @@
             return rhs.length === n;
         }
 
-        function displayResult(result) {
+        function displayResult(result, showSteps) {
             var resultElem = document.getElementById('result');
+            var result2Elem = document.getElementById('result2');
+            var result3Elem = document.getElementById('result3');
+
             resultElem.innerHTML = '<h3>Hasil</h3><p>' + result.join(', ') + '</p>';
+            result2Elem.innerHTML = '';
+            result3Elem.innerHTML = '';
+
+            if (showSteps) {
+                var steps = result.steps;
+                var matrixSteps = result.matrixSteps;
+                var solution = result.solution;
+
+                for (var i = 0; i < steps.length; i++) {
+                    var stepElem = document.createElement('p');
+                    stepElem.textContent = 'Langkah ' + (i + 1) + ': ' + steps[i];
+                    result2Elem.appendChild(stepElem);
+                }
+
+                var solutionElem = document.createElement('p');
+                solutionElem.textContent = 'Solusi: ' + solution.join(', ');
+                result3Elem.appendChild(solutionElem);
+            }
         }
     </script>
 </body>
