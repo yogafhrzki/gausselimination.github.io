@@ -83,50 +83,51 @@
     </div>
     <script>
         function gaussJordan(x, y, verbose = false) {
-            let m = x.length;
-            let n = x[0].length;
-            let augmentedMat = new Array(m).fill(0).map(() => new Array(n + 1).fill(0));
+    let m = x.length;
+    let n = x[0].length;
+    let augmentedMat = new Array(m).fill(0).map(() => new Array(n + 1).fill(0));
 
-            for (let i = 0; i < m; i++) {
-                for (let j = 0; j < n; j++) {
-                    augmentedMat[i][j] = x[i][j];
-                }
-                augmentedMat[i][n] = y[i];
-            }
-
-            if (verbose) {
-                console.log(augmentedMat);
-            }
-
-            const outerLoop = [[0, m - 1, 1], [m - 1, 0, -1]];
-            for (let d = 0; d < 2; d++) {
-                for (let i = outerLoop[d][0]; i != outerLoop[d][1]; i += outerLoop[d][2]) {
-                    const innerLoop = [[i + 1, m, 1], [i - 1, -1, -1]];
-                    for (let j = innerLoop[d][0]; j != innerLoop[d][1]; j += innerLoop[d][2]) {
-                        const k = (-1) * augmentedMat[j][i] / augmentedMat[i][i];
-                        for (let l = 0; l <= n; l++) {
-                            augmentedMat[j][l] = augmentedMat[j][l] + k * augmentedMat[i][l];
-                        }
-                        if (verbose) {
-                            console.log(augmentedMat);
-                        }
-                    }
-                }
-            }
-
-            for (let i = 0; i < m; i++) {
-                const divisor = augmentedMat[i][i];
-                for (let j = 0; j <= n; j++){
-                    augmentedMat[i][j] = augmentedMat[i][j] / divisor;
-                }
-            }
-
-            if (verbose){
-                console.log(augmentedMat);
-            }
-
-            return augmentedMat;
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            augmentedMat[i][j] = x[i][j];
         }
+        augmentedMat[i][n] = y[i];
+    }
+
+    if (verbose) {
+        console.log(augmentedMat);
+    }
+
+    const outerLoop = [[0, m - 1, 1], [m - 1, 0, -1]];
+    for (let d = 0; d < 2; d++) {
+        for (let i = outerLoop[d][0]; i != outerLoop[d][1]; i += outerLoop[d][2]) {
+            const innerLoop = [[i + 1, m, 1], [i - 1, -1, -1]];
+            for (let j = innerLoop[d][0]; j != innerLoop[d][1]; j += innerLoop[d][2]) {
+                const k = (-1) * augmentedMat[j][i] / augmentedMat[i][i];
+                for (let l = 0; l <= n; l++) {
+                    augmentedMat[j][l] = augmentedMat[j][l] + k * augmentedMat[i][l];
+                }
+                if (verbose) {
+                    console.log(augmentedMat);
+                }
+            }
+        }
+    }
+
+    for (let i = 0; i < m; i++) {
+        const divisor = augmentedMat[i][i];
+        for (let j = 0; j <= n; j++){
+            augmentedMat[i][j] = augmentedMat[i][j] / divisor;
+        }
+    }
+
+    if (verbose) {
+        console.log(augmentedMat);
+    }
+
+    return augmentedMat;
+}
+
 
         const matrixInput = document.getElementById("matrixInput");
         const rhsInput = document.getElementById("rhsInput");
