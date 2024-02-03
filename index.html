@@ -31,13 +31,6 @@
         #matrixInput {
             height: 150px;
         }
-        #result {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
-        }
         .result-container {
             display: flex;
             flex-direction: column;
@@ -199,8 +192,9 @@
             const rhs = rhsRows.map(Number);
             const result = gaussJordan(matrixRows, rhs);
 
-            const resultString = result.map(row => row[row.length - 1]).join(", ");
-            alert("Hasil: " + resultString);
+            const resultString = result.map(row => row[row.length - 1]);
+
+            alert("Hasil: [" + resultString.join(", ") + "]");
         });
 
         function isValidMatrix(matrix) {
