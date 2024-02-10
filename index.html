@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Metode Eliminasi Gauss</title>
     <style>
+        body {
+            background-image: url("backgroundmath.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0; 
+            padding: 0; 
+            font-family: Arial, sans-serif; 
+        }
+
         .container {
             max-width: 800px;
             margin: 20px auto;
@@ -13,24 +23,29 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             text-align: center;
         }
+
         .alert {
             padding: 15px;
             background-color: #f2f2f2;
             color: #333;
             border-radius: 5px;
         }
+
         .form-control {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         #matrixInput {
             height: 150px;
         }
+
         .result-container {
             display: flex;
             flex-direction: column;
@@ -40,7 +55,9 @@
             border-radius: 5px;
             background-color: #fff;
         }
-        #calculateButton, #showResultButton {
+
+        #calculateButton,
+        #showResultButton {
             display: block;
             width: 100%;
             padding: 10px;
@@ -53,16 +70,20 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1>Metode Eliminasi Gauss</h1>
-        <div class="alert" role="alert">Input harus berupa matriks dengan format <b>A|b</b> - yang berarti Anda perlu memasukkan matriks berukuran <b>n * n+1</b>. Kolomnya dipisahkan oleh spasi.</div>
-        <textarea id="matrixInput" class="form-control" rows="8">2 3 -1
-1 2 -4
-1 1 4</textarea>
+        <h1>Kalkulator Matriks Menggunakan Metode Eliminasi Gauss</h1>
+        <div class="alert" role="alert">Input harus berupa matriks dengan format 3x3 atau 4x4 yang dipisahkan oleh spasi.
+        <textarea id="matrixInput" class="form-control" rows="8">2 3 -1 0
+1 2 -4 1
+1 1 4 1
+0 1 2 -1</textarea>
+        <p>Masukan sisi kanan matriks disini</p>
         <textarea id="rhsInput" class="form-control" rows="8">6
 8
-4</textarea>
+4
+3</textarea>
         <button id="calculateButton">Tampilkan Langkah-langkah</button>
         <button id="showResultButton">Tampilkan Hasil</button>
         <div id="result" class="result-container"></div>
@@ -101,15 +122,15 @@
                             console.log(augmentedMat);
                         }
                         steps.push(`Gunakan baris ${i + 1} untuk baris ${j + 1}\n` +
-                                   `k=${k.toFixed(2)} * [${augmentedMat[i].join(' ')}] = [${augmentedMat[j].join(' ')}]\n` +
-                                   `${augmentedMat.map(row => `[${row.join(' ')}]`).join('\n')}`);
+                            `k=${k.toFixed(2)} * [${augmentedMat[i].join(' ')}] = [${augmentedMat[j].join(' ')}]\n` +
+                            `${augmentedMat.map(row => `[${row.join(' ')}]`).join('\n')}`);
                     }
                 }
             }
 
             for (let i = 0; i < m; i++) {
                 const divisor = augmentedMat[i][i];
-                for (let j = 0; j <= n; j++){
+                for (let j = 0; j <= n; j++) {
                     augmentedMat[i][j] = augmentedMat[i][j] / divisor;
                 }
             }
@@ -130,7 +151,7 @@
         const resultDiv2 = document.getElementById("result2");
         const resultDiv3 = document.getElementById("result3");
 
-        calculateButton.addEventListener("click", function() {
+        calculateButton.addEventListener("click", function () {
             const matrixString = matrixInput.value.trim();
             const rhsString = rhsInput.value.trim();
 
@@ -167,7 +188,7 @@
             });
         });
 
-        showResultButton.addEventListener("click", function() {
+        showResultButton.addEventListener("click", function () {
             const matrixString = matrixInput.value.trim();
             const rhsString = rhsInput.value.trim();
 
